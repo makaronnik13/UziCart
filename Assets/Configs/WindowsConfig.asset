@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91f52a3b30ff4b14a98b0f86b50f6d48, type: 3}
+  m_Name: WindowsConfig
+  m_EditorClassIdentifier: Assembly-CSharp::WindowsConfig
+  menuWindowId: {fileID: 11400000, guid: 826b4aa4c6d397a4aa8717fc6f02ef5a, type: 2}
+  exitConfirmationPopupId: {fileID: 11400000, guid: be4ca4a6d33c4ed48b414bb0237820dd, type: 2}
+  settingsWindowId: {fileID: 11400000, guid: f10fb3d805137bd47b638c80cf9120d8, type: 2}
+  carSelectionWindowId: {fileID: 11400000, guid: 4e1af7b968235f5438fec907610d578f, type: 2}
+  trackSelectionWindowId: {fileID: 11400000, guid: fe43747ca8449da41be1facc28fc5984, type: 2}

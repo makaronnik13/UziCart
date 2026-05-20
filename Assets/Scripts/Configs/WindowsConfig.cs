@@ -1,0 +1,12 @@
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "WindowsConfig", menuName = "UI/WindowsConfig")]
+public class WindowsConfig : ScriptableObject
+{
+    public WindowId menuWindowId;
+    public WindowId exitConfirmationPopupId;
+    public WindowId settingsWindowId;
+    public WindowId carSelectionWindowId;
+    public WindowId trackSelectionWindowId;
+    public WindowId inGameMenuWindowId;
+}

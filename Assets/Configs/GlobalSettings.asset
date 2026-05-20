@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df55d6072b011c344827312487d52445, type: 3}
+  m_Name: GlobalSettings
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalSettings
+  testTools: 0
+  windowsConfig: {fileID: 0}
+  inputActionsConfig: {fileID: 0}
+  menuSceneName: Menu
+  cars:
+  - {fileID: 11400000, guid: d5362061e30801448a2039df3becf513, type: 2}
+  - {fileID: 11400000, guid: 2fd1ed99c1664f64aa5db42a793c8e79, type: 2}
+  - {fileID: 11400000, guid: b34b23b51dd11ce459323127ee2c4446, type: 2}
+  - {fileID: 11400000, guid: 30870f8c4098f5442aecbe59be17ee19, type: 2}
+  - {fileID: 11400000, guid: a9c58a6513f6f8b469631f4f5007e9f4, type: 2}
+  - {fileID: 11400000, guid: 41425ad003e4b34449716c65396bbb8f, type: 2}
+  tracks:
+  - {fileID: 11400000, guid: 33f722362ed3f674b9d637bb7676bca5, type: 2}
+  - {fileID: 11400000, guid: 83a96687293d1e74699b89ec5c7cd0ab, type: 2}
+  - {fileID: 11400000, guid: 5532a087bc086a949a37eec62001b0f0, type: 2}
+  - {fileID: 11400000, guid: 5420487372dc0214788412718ae65afd, type: 2}
+  - {fileID: 11400000, guid: f1433bbd842301949bf5d32f567fd7d5, type: 2}

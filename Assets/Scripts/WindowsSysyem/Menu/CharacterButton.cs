@@ -67,7 +67,7 @@ public class CharacterButton : MonoBehaviour
         {
             _icon.sprite = character != null ? character.Preview : null;
             _icon.enabled = _icon.sprite != null;
-            _icon.preserveAspect = true;
+           // _icon.preserveAspect = true;
         }
 
         if (_nameText != null)

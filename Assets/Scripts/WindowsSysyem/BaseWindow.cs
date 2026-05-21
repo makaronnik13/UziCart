@@ -312,7 +312,13 @@ public class BaseWindow : MonoBehaviour
             return false;
         }
 
-        return _animator.HasState(0, Animator.StringToHash(stateName));
+        if (_animator.HasState(0, Animator.StringToHash(stateName)))
+        {
+            return true;
+        }
+
+        string layerStateName = $"{_animator.GetLayerName(0)}.{stateName}";
+        return _animator.HasState(0, Animator.StringToHash(layerStateName));
     }
 
     void ApplyShownState()

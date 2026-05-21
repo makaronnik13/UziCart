@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4f8e9ff6940faf44a3bebf45408a801, type: 3}
   m_Name: Character_1
   m_EditorClassIdentifier: Assembly-CSharp::CarConfigSO
-  Prefab: {fileID: 0}
+  Prefab: {fileID: 4607965256824710622, guid: a648868af0bd0ca4097204c3d784a025, type: 3}
   Preview: {fileID: 21300000, guid: 6bcf940680db6654bb9537960467b114, type: 3}
   CarName: Lil Uzi
   Speed: 3

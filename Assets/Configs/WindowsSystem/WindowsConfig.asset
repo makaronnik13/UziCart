@@ -17,17 +17,6 @@ MonoBehaviour:
   settingsWindowId: {fileID: 11400000, guid: f10fb3d805137bd47b638c80cf9120d8, type: 2}
   carSelectionWindowId: {fileID: 11400000, guid: 4e1af7b968235f5438fec907610d578f, type: 2}
   trackSelectionWindowId: {fileID: 11400000, guid: fe43747ca8449da41be1facc28fc5984, type: 2}
-  cardPickWindowId: {fileID: 0}
   inGameMenuWindowId: {fileID: 0}
-  researchWindowId: {fileID: 0}
-  financeResearchWindowId: {fileID: 0}
-  scienceResearchWindowId: {fileID: 0}
-  magicResearchWindowId: {fileID: 0}
-  safetyResearchWindowId: {fileID: 0}
-  imageResearchWindowId: {fileID: 0}
-  encounterWindowId: {fileID: 0}
-  endDaySummaryWindowId: {fileID: 0}
-  cheatMenuWindowId: {fileID: 0}
-  cardsCheatWindowId: {fileID: 0}
-  actorRosterCheatWindowId: {fileID: 0}
-  encountersCheatWindowId: {fileID: 0}
+  popupWindowIds:
+  - {fileID: 11400000, guid: be4ca4a6d33c4ed48b414bb0237820dd, type: 2}

@@ -5,6 +5,8 @@ using Zenject;
 
 public class MainMenuWindow : BaseWindow
 {
+    const string LogPrefix = "[MainMenuWindow]";
+
     [SerializeField] Button _newGameButton;
     [SerializeField] Button _settingsButton;
     [SerializeField] Button _exitButton;
@@ -18,6 +20,7 @@ public class MainMenuWindow : BaseWindow
     protected override void Awake()
     {
         base.Awake();
+        Debug.Log($"{LogPrefix} Awake. Buttons: newGame={Describe(_newGameButton)}, settings={Describe(_settingsButton)}, exit={Describe(_exitButton)}", this);
         _newGameButton?.onClick.AddListener(OpenCarSelection);
         _settingsButton?.onClick.AddListener(OpenSettings);
         _exitButton?.onClick.AddListener(OpenExitConfirmation);
@@ -33,6 +36,7 @@ public class MainMenuWindow : BaseWindow
     protected override void OnShow(object payload)
     {
         base.OnShow(payload);
+        Debug.Log($"{LogPrefix} OnShow. windowsService={Describe(_windowsService)}, settings={Describe(_settings)}, windowsConfig={Describe(_settings != null ? _settings.windowsConfig : null)}", this);
         PlayMenuMusic();
     }
 
@@ -53,25 +57,96 @@ public class MainMenuWindow : BaseWindow
 
     void OpenCarSelection()
     {
-        if (_settings?.windowsConfig?.carSelectionWindowId != null)
+        Debug.Log($"{LogPrefix} New Game clicked. windowsService={Describe(_windowsService)}, carSelectionWindowId={Describe(_settings?.windowsConfig?.carSelectionWindowId)}", this);
+        if (!CanOpenWindow(_settings?.windowsConfig?.carSelectionWindowId, "car selection"))
         {
-            _windowsService?.Open(_settings.windowsConfig.carSelectionWindowId);
+            return;
         }
+
+        OpenConfiguredWindow(_settings.windowsConfig.carSelectionWindowId);
     }
 
     void OpenSettings()
     {
-        if (_settings?.windowsConfig?.settingsWindowId != null)
+        Debug.Log($"{LogPrefix} Settings clicked. windowsService={Describe(_windowsService)}, settingsWindowId={Describe(_settings?.windowsConfig?.settingsWindowId)}", this);
+        if (!CanOpenWindow(_settings?.windowsConfig?.settingsWindowId, "settings"))
         {
-            _windowsService?.OpenPopup(_settings.windowsConfig.settingsWindowId);
+            return;
         }
+
+        OpenConfiguredWindow(_settings.windowsConfig.settingsWindowId);
     }
 
     void OpenExitConfirmation()
     {
-        if (_settings?.windowsConfig?.exitConfirmationPopupId != null)
+        Debug.Log($"{LogPrefix} Exit clicked. windowsService={Describe(_windowsService)}, exitConfirmationPopupId={Describe(_settings?.windowsConfig?.exitConfirmationPopupId)}", this);
+        if (!CanOpenWindow(_settings?.windowsConfig?.exitConfirmationPopupId, "exit confirmation"))
         {
-            _windowsService?.OpenPopup(_settings.windowsConfig.exitConfirmationPopupId);
+            return;
         }
+
+        OpenConfiguredWindow(_settings.windowsConfig.exitConfirmationPopupId);
+    }
+
+    void OpenConfiguredWindow(WindowId windowId)
+    {
+        if (_settings.windowsConfig.IsPopup(windowId))
+        {
+            _windowsService.OpenPopup(windowId);
+            return;
+        }
+
+        _windowsService.Open(windowId, keepPrevious: true);
+    }
+
+    bool CanOpenWindow(WindowId windowId, string windowName)
+    {
+        if (_windowsService == null)
+        {
+            Debug.LogError($"{LogPrefix} Cannot open {windowName}: IWindowsService was not injected.", this);
+            return false;
+        }
+
+        if (_settings == null)
+        {
+            Debug.LogError($"{LogPrefix} Cannot open {windowName}: GlobalSettings was not injected.", this);
+            return false;
+        }
+
+        if (_settings.windowsConfig == null)
+        {
+            Debug.LogError($"{LogPrefix} Cannot open {windowName}: GlobalSettings.windowsConfig is null.", this);
+            return false;
+        }
+
+        if (windowId == null)
+        {
+            Debug.LogError($"{LogPrefix} Cannot open {windowName}: WindowId is null in WindowsConfig.", this);
+            return false;
+        }
+
+        return true;
+    }
+
+    static string Describe(Object target)
+    {
+        return target != null ? target.name : "null";
+    }
+
+    static string Describe(object target)
+    {
+        return target != null ? target.GetType().Name : "null";
+    }
+
+    static string Describe(WindowId windowId)
+    {
+        return windowId != null
+            ? windowId.name
+            : "null";
+    }
+
+    static string Describe(IWindowsService service)
+    {
+        return service != null ? service.GetType().Name : "null";
     }
 }

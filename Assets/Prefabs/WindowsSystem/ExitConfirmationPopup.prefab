@@ -214,7 +214,7 @@ MonoBehaviour:
   preventHide: 0
   blocksCameraInput: 1
   _openSound: 4
-  _closeSound: 5
+  _closeSound: 0
   _confirmButton: {fileID: 2075811444306290776}
   _cancelButton: {fileID: 8801912287420035117}
 --- !u!95 &7257678750172151711
@@ -466,7 +466,7 @@ GameObject:
   - component: {fileID: 3478920486001875544}
   - component: {fileID: 9174850741510587168}
   m_Layer: 0
-  m_Name: Back
+  m_Name: View
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

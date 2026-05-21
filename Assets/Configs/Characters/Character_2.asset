@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4f8e9ff6940faf44a3bebf45408a801, type: 3}
   m_Name: Character_2
   m_EditorClassIdentifier: Assembly-CSharp::CarConfigSO
-  Prefab: {fileID: 0}
+  Prefab: {fileID: 2032426082558567757, guid: fdc75f711fae05b4baf3c9adbc05a6df, type: 3}
   Preview: {fileID: 21300000, guid: 5e57774b821b55147a9af82838b9d43f, type: 3}
   CarName: Baby pluto
   Speed: 4

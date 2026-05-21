@@ -104,13 +104,14 @@ GameObject:
   - component: {fileID: 223991318243899863}
   - component: {fileID: 6436218027616551273}
   - component: {fileID: -1608621053425026330}
+  - component: {fileID: 3878709914786376528}
   m_Layer: 0
   m_Name: TrackButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5181334753285500850
 RectTransform:
   m_ObjectHideFlags: 0
@@ -228,6 +229,20 @@ MonoBehaviour:
   _button: {fileID: 6436218027616551273}
   _icon: {fileID: 4271253501473519046}
   _nameText: {fileID: 2854653514693438289}
+--- !u!114 &3878709914786376528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2218590369660021148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ef3ced3228365c47b386cb9b7242a3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonEventSounds
+  _hoverSound: 0
+  _clickSound: 2
 --- !u!1 &5397167326188173647
 GameObject:
   m_ObjectHideFlags: 0

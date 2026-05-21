@@ -5,21 +5,23 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-[InitializeOnLoad]
 public static class WindowsSystemPrefabBuilder
 {
-    const string AutoBuildKey = "UziCart.WindowsSystemPrefabBuilder.AutoBuilt.v5";
     const string BaseFolder = "Assets/Prefabs/WindowsSystem";
     const string ConfigFolder = "Assets/Configs/WindowsSystem";
-
-    static WindowsSystemPrefabBuilder()
-    {
-        EditorApplication.delayCall += AutoBuildOnce;
-    }
 
     [MenuItem("Tools/UziCart/Build Windows System Prefabs")]
     public static void Build()
     {
+        if (!EditorUtility.DisplayDialog(
+                "Rebuild Windows System Prefabs",
+                "This will overwrite Windows prefabs and WindowsConfig. Continue?",
+                "Rebuild",
+                "Cancel"))
+        {
+            return;
+        }
+
         EnsureFolders();
 
         WindowId menuId = CreateWindowId("MenuWindowId");
@@ -28,22 +30,11 @@ public static class WindowsSystemPrefabBuilder
         WindowId carId = CreateWindowId("CarSelectionWindowId");
         WindowId trackId = CreateWindowId("TrackSelectionWindowId");
 
-        GameObject menuPrefab = SavePrefab(BuildMenu(menuId, carId, settingsId, exitId), "MenuWindow.prefab");
-        GameObject exitPrefab = SavePrefab(BuildExitPopup(exitId), "ExitConfirmationPopup.prefab");
-        GameObject settingsPrefab = SavePrefab(BuildSettings(settingsId), "SettingsWindow.prefab");
-        GameObject carPrefab = SavePrefab(BuildCarSelection(carId), "CarSelectionWindow.prefab");
-        GameObject trackPrefab = SavePrefab(BuildTrackSelection(trackId), "TrackSelectionWindow.prefab");
-
-        SetObject(menuId, "_prefab", menuPrefab);
-        SetObject(exitId, "_prefab", exitPrefab);
-        SetObject(settingsId, "_prefab", settingsPrefab);
-        SetObject(carId, "_prefab", carPrefab);
-        SetObject(trackId, "_prefab", trackPrefab);
-        EditorUtility.SetDirty(menuId);
-        EditorUtility.SetDirty(exitId);
-        EditorUtility.SetDirty(settingsId);
-        EditorUtility.SetDirty(carId);
-        EditorUtility.SetDirty(trackId);
+        SavePrefab(BuildMenu(menuId, carId, settingsId, exitId), "MenuWindow.prefab");
+        SavePrefab(BuildExitPopup(exitId), "ExitConfirmationPopup.prefab");
+        SavePrefab(BuildSettings(settingsId), "SettingsWindow.prefab");
+        SavePrefab(BuildCarSelection(carId), "CarSelectionWindow.prefab");
+        SavePrefab(BuildTrackSelection(trackId), "TrackSelectionWindow.prefab");
 
         WindowsConfig windowsConfig = CreateWindowsConfig();
         windowsConfig.menuWindowId = menuId;
@@ -51,6 +42,7 @@ public static class WindowsSystemPrefabBuilder
         windowsConfig.settingsWindowId = settingsId;
         windowsConfig.carSelectionWindowId = carId;
         windowsConfig.trackSelectionWindowId = trackId;
+        windowsConfig.popupWindowIds.Add(exitId);
         EditorUtility.SetDirty(windowsConfig);
 
         AssignWindowsConfigToGlobalSettings(windowsConfig);
@@ -58,34 +50,6 @@ public static class WindowsSystemPrefabBuilder
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         Debug.Log("Windows System prefabs built in " + BaseFolder);
-    }
-
-    static void AutoBuildOnce()
-    {
-        if (SessionState.GetBool(AutoBuildKey, false))
-        {
-            return;
-        }
-
-        SessionState.SetBool(AutoBuildKey, true);
-        WindowId menuId = AssetDatabase.LoadAssetAtPath<WindowId>($"{ConfigFolder}/MenuWindowId.asset");
-        WindowsConfig windowsConfig = AssetDatabase.LoadAssetAtPath<WindowsConfig>($"{ConfigFolder}/WindowsConfig.asset");
-        GameObject settingsPrefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{BaseFolder}/SettingsWindow.prefab");
-        GameObject trackPrefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{BaseFolder}/TrackSelectionWindow.prefab");
-        if (!Directory.Exists(BaseFolder) ||
-            AssetDatabase.LoadAssetAtPath<GameObject>($"{BaseFolder}/MenuWindow.prefab") == null ||
-            settingsPrefab == null ||
-            settingsPrefab.GetComponentInChildren<VolumeController>(true) == null ||
-            trackPrefab == null ||
-            trackPrefab.GetComponentInChildren<TrackSelectionButton>(true) == null ||
-            menuId == null ||
-            menuId.Prefab == null ||
-            windowsConfig == null ||
-            windowsConfig.menuWindowId == null)
-        {
-            Debug.Log("WindowsSystemPrefabBuilder auto build started.");
-            Build();
-        }
     }
 
     static GameObject BuildMenu(WindowId id, WindowId carId, WindowId settingsId, WindowId exitId)

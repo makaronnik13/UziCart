@@ -151,7 +151,7 @@ GameObject:
   - component: {fileID: 188629805167925486}
   - component: {fileID: 1918724485510534170}
   m_Layer: 0
-  m_Name: Panel
+  m_Name: View
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -348,11 +348,11 @@ MonoBehaviour:
   _useUnscaledTime: 1
   _canvasGroup: {fileID: 2073599410331829422}
   _selectOnShow: {fileID: 0}
-  showOnStart: 0
+  showOnStart: 1
   preventHide: 0
   blocksCameraInput: 1
   _openSound: 4
-  _closeSound: 5
+  _closeSound: 0
   _newGameButton: {fileID: 7977087946950372954}
   _settingsButton: {fileID: 8319309911002886016}
   _exitButton: {fileID: 7960347491451702831}

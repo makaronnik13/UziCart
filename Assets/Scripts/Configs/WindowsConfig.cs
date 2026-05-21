@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "WindowsConfig", menuName = "UI/WindowsConfig")]
@@ -9,4 +10,10 @@ public class WindowsConfig : ScriptableObject
     public WindowId carSelectionWindowId;
     public WindowId trackSelectionWindowId;
     public WindowId inGameMenuWindowId;
+    public List<WindowId> popupWindowIds = new List<WindowId>();
+
+    public bool IsPopup(WindowId windowId)
+    {
+        return windowId != null && popupWindowIds != null && popupWindowIds.Contains(windowId);
+    }
 }

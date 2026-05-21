@@ -330,39 +330,14 @@ public class WindowsService : IWindowsService, IInitializable, IDisposable, IRun
 
         if (!cache.TryGetValue(id, out BaseWindow window) || window == null)
         {
-            window = InstantiateWindowFromConfig(id);
-            if (window == null)
+            RebuildCache();
+            if (!cache.TryGetValue(id, out window) || window == null)
             {
-                Debug.LogError($"Window not found in scene: {id?.name}");
+                Debug.LogError($"Window not found in scene: {id.name}. Add a BaseWindow with this WindowId to the scene.", id);
                 return null;
             }
         }
 
-        return window;
-    }
-
-    BaseWindow InstantiateWindowFromConfig(WindowId id)
-    {
-        GameObject prefab = id != null ? id.Prefab : null;
-        if (prefab == null)
-        {
-            return null;
-        }
-
-        GameObject instance = _container != null
-            ? _container.InstantiatePrefab(prefab)
-            : UnityEngine.Object.Instantiate(prefab);
-        instance.name = prefab.name;
-
-        BaseWindow window = instance.GetComponent<BaseWindow>();
-        if (window == null)
-        {
-            Debug.LogError($"Prefab '{prefab.name}' for window '{id.name}' does not contain BaseWindow.");
-            UnityEngine.Object.Destroy(instance);
-            return null;
-        }
-
-        cache[id] = window;
         return window;
     }
 

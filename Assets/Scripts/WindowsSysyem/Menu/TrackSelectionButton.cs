@@ -47,7 +47,7 @@ public class TrackSelectionButton : MonoBehaviour
         {
             _icon.sprite = track != null ? track.Preview : null;
             _icon.enabled = _icon.sprite != null;
-            _icon.preserveAspect = true;
+            //_icon.preserveAspect = true;
         }
 
         string trackName = track != null ? track.TrackName : "Track";

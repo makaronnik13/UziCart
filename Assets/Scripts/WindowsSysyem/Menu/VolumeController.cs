@@ -101,6 +101,7 @@ public class VolumeController : MonoBehaviour
         if (_slider != null)
         {
             _slider.SetValueWithoutNotify(volume);
+            _slider.interactable = !muted;
         }
 
         if (_toggle != null)
@@ -108,7 +109,7 @@ public class VolumeController : MonoBehaviour
             _toggle.SetIsOnWithoutNotify(!muted);
         }
 
-        SetValueText(volume, muted);
+        RefreshView(volume, muted);
     }
 
     void SetVolume(float value)
@@ -128,7 +129,7 @@ public class VolumeController : MonoBehaviour
             _soundService.SetSfxVolume(value);
         }
 
-        SetValueText(value, IsMuted());
+        RefreshView(value, IsMuted());
     }
 
     void SetEnabled(bool enabled)
@@ -147,7 +148,7 @@ public class VolumeController : MonoBehaviour
             _soundService.SetSfxMuted(!enabled);
         }
 
-        SetValueText(GetVolume(), !enabled);
+        RefreshView(GetVolume(), !enabled);
     }
 
     float GetVolume()
@@ -181,6 +182,16 @@ public class VolumeController : MonoBehaviour
         {
             _valueText.text = value;
         }
+    }
+
+    void RefreshView(float volume, bool muted)
+    {
+        if (_slider != null)
+        {
+            _slider.interactable = !muted;
+        }
+
+        SetValueText(volume, muted);
     }
 
     void AutoBind()

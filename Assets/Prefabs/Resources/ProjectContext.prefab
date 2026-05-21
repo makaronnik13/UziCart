@@ -280,15 +280,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Sound.SfxComponent
   sounds:
   - soundName: ButtonClick
-    audioClips: []
+    audioClips:
+    - {fileID: 8300000, guid: 32821790ff75e1746a213b0a144fe456, type: 3}
     _mode: 0
     _overridenSource: {fileID: 0}
-  - soundName: OpenWindow
-    audioClips: []
-    _mode: 0
-    _overridenSource: {fileID: 0}
-  - soundName: Back
-    audioClips: []
+  - soundName: WindowClose
+    audioClips:
+    - {fileID: 8300000, guid: 5272177f3f6430e4dbd6b9bd5071f033, type: 3}
     _mode: 0
     _overridenSource: {fileID: 0}
   audioSource: {fileID: 5838426892564536023}

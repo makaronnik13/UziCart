@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: GlobalSettings
   m_EditorClassIdentifier: Assembly-CSharp::GlobalSettings
   testTools: 0
-  windowsConfig: {fileID: 0}
+  windowsConfig: {fileID: 11400000, guid: 8844764aff58f424ea19f117228d3003, type: 2}
   inputActionsConfig: {fileID: 0}
   menuSceneName: Menu
+  gameplaySceneName: Gameplay
   cars:
   - {fileID: 11400000, guid: d5362061e30801448a2039df3becf513, type: 2}
   - {fileID: 11400000, guid: 2fd1ed99c1664f64aa5db42a793c8e79, type: 2}

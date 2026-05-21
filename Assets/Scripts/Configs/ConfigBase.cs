@@ -113,17 +113,13 @@ public abstract class ConfigBase : ScriptableObject
             return;
         }
 
-        if (assetGuid != guid)
+        if (string.IsNullOrEmpty(configId))
         {
-            assetGuid = guid;
             GenerateNewIdInternal();
             return;
         }
 
-        if (string.IsNullOrEmpty(configId))
-        {
-            GenerateNewIdInternal();
-        }
+        assetGuid = guid;
     }
 
     void GenerateNewIdInternal()

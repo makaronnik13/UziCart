@@ -259,7 +259,15 @@ public class CarSelectionWindow : BaseWindow
         _metaGameService.SelectCar(_selectedIndex);
         if (_settings?.windowsConfig?.trackSelectionWindowId != null)
         {
-            _windowsService?.Open(_settings.windowsConfig.trackSelectionWindowId);
+            WindowId trackSelectionWindowId = _settings.windowsConfig.trackSelectionWindowId;
+            if (_settings.windowsConfig.IsPopup(trackSelectionWindowId))
+            {
+                _windowsService?.OpenPopup(trackSelectionWindowId);
+            }
+            else
+            {
+                _windowsService?.Open(trackSelectionWindowId, keepPrevious: true);
+            }
         }
     }
 }

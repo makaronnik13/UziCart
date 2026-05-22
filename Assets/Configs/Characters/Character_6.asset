@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Character_6
   m_EditorClassIdentifier: Assembly-CSharp::CarConfigSO
   Prefab: {fileID: 4984401740779544538, guid: 1e674239c7075fb4b8f1121ca171a3f6, type: 3}
+  RacePrefab: {fileID: 3100580912852634987, guid: 3ce858f622cad8242a07510b8e25072d, type: 3}
   Preview: {fileID: 21300000, guid: 5b22af37bbbce4941b2921fb1282cd8e, type: 3}
   CarName: Diamond Uzi
   Speed: 4

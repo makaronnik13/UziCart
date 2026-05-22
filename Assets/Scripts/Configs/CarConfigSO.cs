@@ -5,6 +5,7 @@ using UnityEngine.Serialization;
 public class CarConfigSO : ScriptableObject
 {
     public GameObject Prefab;
+    public GameObject RacePrefab;
     public Sprite Preview;
     [FormerlySerializedAs("CharacterName")]
     public string CarName = "Car";

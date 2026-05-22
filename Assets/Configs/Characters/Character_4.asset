@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Character_4
   m_EditorClassIdentifier: Assembly-CSharp::CarConfigSO
   Prefab: {fileID: 7378068092217211953, guid: 141a4a7d8dcd206408c35d514b499b35, type: 3}
+  RacePrefab: {fileID: 3044968328678115214, guid: 23942dc5f356478468dc2889279178d2, type: 3}
   Preview: {fileID: 21300000, guid: a952dfbfe9771a74d8b9d9c8c5524a39, type: 3}
   CarName: Pink tape demon
   Speed: 3

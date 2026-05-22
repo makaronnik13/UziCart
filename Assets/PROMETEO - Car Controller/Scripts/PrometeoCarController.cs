@@ -9,11 +9,8 @@ something useful for your game. Best regards, Mena.
 */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.UI;
 
 public class PrometeoCarController : MonoBehaviour
 {
@@ -85,15 +82,6 @@ public class PrometeoCarController : MonoBehaviour
       public TrailRenderer RLWTireSkid;
       public TrailRenderer RRWTireSkid;
 
-    //SPEED TEXT (UI)
-
-      [Space(20)]
-      //[Header("UI")]
-      [Space(10)]
-      //The following variable lets you to set up a UI text to display the speed of your car.
-      public bool useUI = false;
-      public Text carSpeedText; // Used to store the UI object that is going to show the speed of the car.
-
     //SOUNDS
 
       [Space(20)]
@@ -105,28 +93,6 @@ public class PrometeoCarController : MonoBehaviour
       public AudioSource tireScreechSound; // This variable stores the sound of the tire screech (when the car is drifting).
       float initialCarEngineSoundPitch; // Used to store the initial pitch of the car engine sound.
 
-    //CONTROLS
-
-      [Space(20)]
-      //[Header("CONTROLS")]
-      [Space(10)]
-      //The following variables lets you to set up touch controls for mobile devices.
-      public bool useTouchControls = false;
-      public GameObject throttleButton;
-      PrometeoTouchInput throttlePTI;
-      public GameObject reverseButton;
-      PrometeoTouchInput reversePTI;
-      public GameObject turnRightButton;
-      PrometeoTouchInput turnRightPTI;
-      public GameObject turnLeftButton;
-      PrometeoTouchInput turnLeftPTI;
-      public GameObject handbrakeButton;
-      PrometeoTouchInput handbrakePTI;
-
-      [Space(10)]
-      public InputActionReference driveInput;
-      public InputActionReference handbrakeInput;
-
     //CAR DATA
 
       [HideInInspector]
@@ -135,6 +101,9 @@ public class PrometeoCarController : MonoBehaviour
       public bool isDrifting; // Used to know whether the car is drifting or not.
       [HideInInspector]
       public bool isTractionLocked; // Used to know whether the traction of the car is locked or not.
+      public IReadOnlyReactiveProperty<float> SpeedKmh => _speedKmh;
+      public bool ControlEnabled => _controlEnabled;
+      [SerializeField] bool debugControlInput;
 
     //PRIVATE VARIABLES
 
@@ -148,9 +117,12 @@ public class PrometeoCarController : MonoBehaviour
       float localVelocityZ;
       float localVelocityX;
       bool deceleratingCar;
-      bool touchControlsSetup = false;
-      bool driveInputEnabledByThis;
-      bool handbrakeInputEnabledByThis;
+      float steeringInput;
+      bool moveForwardInput;
+      bool stopInput;
+      bool _controlEnabled = true;
+      float _nextControlDebugTime;
+      readonly ReactiveProperty<float> _speedKmh = new ReactiveProperty<float>(0f);
       /*
       The following variables are used to store information about sideways friction of the wheels (such as
       extremumSlip,extremumValue, asymptoteSlip, asymptoteValue and stiffness). We change this values to
@@ -165,14 +137,9 @@ public class PrometeoCarController : MonoBehaviour
       WheelFrictionCurve RRwheelFriction;
       float RRWextremumSlip;
 
-    void OnEnable(){
-      EnableInputAction(driveInput, ref driveInputEnabledByThis);
-      EnableInputAction(handbrakeInput, ref handbrakeInputEnabledByThis);
-    }
-
-    void OnDisable(){
-      DisableInputAction(driveInput, ref driveInputEnabledByThis);
-      DisableInputAction(handbrakeInput, ref handbrakeInputEnabledByThis);
+    void OnDestroy()
+    {
+      _speedKmh.Dispose();
     }
 
     // Start is called before the first frame update
@@ -221,18 +188,13 @@ public class PrometeoCarController : MonoBehaviour
           initialCarEngineSoundPitch = carEngineSound.pitch;
         }
 
-        // We invoke 2 methods inside this script. CarSpeedUI() changes the text of the UI object that stores
-        // the speed of the car and CarSounds() controls the engine and drifting sounds. Both methods are invoked
-        // in 0 seconds, and repeatedly called every 0.1 seconds.
-        if(useUI){
-          InvokeRepeating("CarSpeedUI", 0f, 0.1f);
-        }else if(!useUI){
-          if(carSpeedText != null){
-            carSpeedText.text = "0";
-          }
-        }
-
         if(useSounds){
+          if(carEngineSound != null && !carEngineSound.isPlaying){
+            carEngineSound.Play();
+          }
+          if(tireScreechSound != null && tireScreechSound.isPlaying){
+            tireScreechSound.Stop();
+          }
           InvokeRepeating("CarSounds", 0f, 0.1f);
         }else if(!useSounds){
           if(carEngineSound != null){
@@ -258,25 +220,6 @@ public class PrometeoCarController : MonoBehaviour
           }
         }
 
-        if(useTouchControls){
-          if(throttleButton != null && reverseButton != null &&
-          turnRightButton != null && turnLeftButton != null
-          && handbrakeButton != null){
-
-            throttlePTI = throttleButton.GetComponent<PrometeoTouchInput>();
-            reversePTI = reverseButton.GetComponent<PrometeoTouchInput>();
-            turnLeftPTI = turnLeftButton.GetComponent<PrometeoTouchInput>();
-            turnRightPTI = turnRightButton.GetComponent<PrometeoTouchInput>();
-            handbrakePTI = handbrakeButton.GetComponent<PrometeoTouchInput>();
-            touchControlsSetup = true;
-
-          }else{
-            String ex = "Touch controls are not completely set up. You must drag and drop your scene buttons in the" +
-            " PrometeoCarController component.";
-            Debug.LogWarning(ex);
-          }
-        }
-
     }
 
     // Update is called once per frame
@@ -287,157 +230,107 @@ public class PrometeoCarController : MonoBehaviour
 
       // We determine the speed of the car.
       carSpeed = (2 * Mathf.PI * frontLeftCollider.radius * frontLeftCollider.rpm * 60) / 1000;
+      _speedKmh.Value = Mathf.Abs(carSpeed);
       // Save the local velocity of the car in the x axis. Used to know if the car is drifting.
       localVelocityX = transform.InverseTransformDirection(carRigidbody.linearVelocity).x;
       // Save the local velocity of the car in the z axis. Used to know if the car is going forward or backwards.
       localVelocityZ = transform.InverseTransformDirection(carRigidbody.linearVelocity).z;
 
-      //CAR PHYSICS
-
-      /*
-      The next part is regarding to the car controller. First, it checks if the user wants to use touch controls (for
-      mobile devices) or analog input controls (WASD + Space).
-
-      The following methods are called whenever a certain key is pressed. For example, in the first 'if' we call the
-      method GoForward() if the user has pressed W.
-
-      In this part of the code we specify what the car needs to do if the user presses W (throttle), S (reverse),
-      A (turn left), D (turn right) or Space bar (handbrake).
-      */
-      if (useTouchControls && touchControlsSetup){
-
-        if(throttlePTI.buttonPressed){
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          GoForward();
-        }
-        if(reversePTI.buttonPressed){
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          GoReverse();
-        }
-
-        if(turnLeftPTI.buttonPressed){
-          TurnLeft();
-        }
-        if(turnRightPTI.buttonPressed){
-          TurnRight();
-        }
-        if(handbrakePTI.buttonPressed){
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          Handbrake();
-        }
-        if(!handbrakePTI.buttonPressed){
-          RecoverTraction();
-        }
-        if((!throttlePTI.buttonPressed && !reversePTI.buttonPressed)){
-          ThrottleOff();
-        }
-        if((!reversePTI.buttonPressed && !throttlePTI.buttonPressed) && !handbrakePTI.buttonPressed && !deceleratingCar){
-          InvokeRepeating("DecelerateCar", 0f, 0.1f);
-          deceleratingCar = true;
-        }
-        if(!turnLeftPTI.buttonPressed && !turnRightPTI.buttonPressed && steeringAxis != 0f){
-          ResetSteeringAngle();
-        }
-
-      }else{
-
-        Vector2 driveAxis = ReadActionValue(driveInput);
-        bool throttlePressed = driveAxis.y > 0.1f;
-        bool reversePressed = driveAxis.y < -0.1f;
-        bool turnLeftPressed = driveAxis.x < -0.1f;
-        bool turnRightPressed = driveAxis.x > 0.1f;
-        bool handbrakePressed = IsActionPressed(handbrakeInput);
-
-        if(throttlePressed){
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          GoForward();
-        }
-        if(reversePressed){
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          GoReverse();
-        }
-
-        if(turnLeftPressed){
-          TurnLeft();
-        }
-        if(turnRightPressed){
-          TurnRight();
-        }
-        if(handbrakePressed){
-          CancelInvoke("DecelerateCar");
-          deceleratingCar = false;
-          Handbrake();
-        }
-        if(WasActionReleasedThisFrame(handbrakeInput)){
-          RecoverTraction();
-        }
-        if((!reversePressed && !throttlePressed)){
-          ThrottleOff();
-        }
-        if((!reversePressed && !throttlePressed) && !handbrakePressed && !deceleratingCar){
-          InvokeRepeating("DecelerateCar", 0f, 0.1f);
-          deceleratingCar = true;
-        }
-        if(!turnLeftPressed && !turnRightPressed && steeringAxis != 0f){
-          ResetSteeringAngle();
-        }
-
-      }
-
+      ApplyControlInput();
 
       // We call the method AnimateWheelMeshes() in order to match the wheel collider movements with the 3D meshes of the wheels.
       AnimateWheelMeshes();
 
     }
 
-    void EnableInputAction(InputActionReference inputActionReference, ref bool enabledByThis){
-      InputAction action = inputActionReference != null ? inputActionReference.action : null;
-      if(action != null && !action.enabled){
-        action.Enable();
-        enabledByThis = true;
-      }
+    public void SetSteering(float value){
+      steeringInput = Mathf.Clamp(value, -1f, 1f);
     }
 
-    void DisableInputAction(InputActionReference inputActionReference, ref bool enabledByThis){
-      InputAction action = inputActionReference != null ? inputActionReference.action : null;
-      if(action != null && enabledByThis){
-        action.Disable();
-        enabledByThis = false;
-      }
+    public void SetMoveForward(bool pressed){
+      moveForwardInput = pressed;
     }
 
-    bool IsActionPressed(InputActionReference inputActionReference){
-      InputAction action = inputActionReference != null ? inputActionReference.action : null;
-      return action != null && action.IsPressed();
+    public void SetStop(bool pressed){
+      stopInput = pressed;
     }
 
-    Vector2 ReadActionValue(InputActionReference inputActionReference){
-      InputAction action = inputActionReference != null ? inputActionReference.action : null;
-      return action != null ? action.ReadValue<Vector2>() : Vector2.zero;
-    }
-
-    bool WasActionReleasedThisFrame(InputActionReference inputActionReference){
-      InputAction action = inputActionReference != null ? inputActionReference.action : null;
-      return action != null && action.WasReleasedThisFrame();
-    }
-
-    // This method converts the car speed data from float to string, and then set the text of the UI carSpeedText with this value.
-    public void CarSpeedUI(){
-
-      if(useUI){
-          try{
-            float absoluteCarSpeed = Mathf.Abs(carSpeed);
-            carSpeedText.text = Mathf.RoundToInt(absoluteCarSpeed).ToString();
-          }catch(Exception ex){
-            Debug.LogWarning(ex);
-          }
+    public void SetControlEnabled(bool enabled){
+      _controlEnabled = enabled;
+      if(enabled){
+        return;
       }
 
+      moveForwardInput = false;
+      stopInput = false;
+      steeringInput = 0f;
+      ThrottleOff();
+      Brakes();
+      RecoverTraction();
+    }
+
+    public void ResetControlInput(){
+      moveForwardInput = false;
+      stopInput = false;
+      steeringInput = 0f;
+    }
+
+    void ApplyControlInput(){
+      if(!_controlEnabled){
+        ThrottleOff();
+        Brakes();
+        if(steeringAxis != 0f){
+          ResetSteeringAngle();
+        }
+        return;
+      }
+
+      if(moveForwardInput){
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        GoForward();
+      }
+      if(stopInput){
+        CancelInvoke("DecelerateCar");
+        deceleratingCar = false;
+        GoReverse();
+      }
+
+      if(steeringInput < -0.1f){
+        TurnLeft();
+      }else if(steeringInput > 0.1f){
+        TurnRight();
+      }else if(steeringAxis != 0f){
+        ResetSteeringAngle();
+      }
+
+      if(!moveForwardInput && !stopInput){
+        ThrottleOff();
+      }
+      if(!moveForwardInput && !stopInput && !deceleratingCar){
+        InvokeRepeating("DecelerateCar", 0f, 0.1f);
+        deceleratingCar = true;
+      }
+
+      DebugForwardDrift();
+    }
+
+    void DebugForwardDrift(){
+      if(!debugControlInput || Time.time < _nextControlDebugTime){
+        return;
+      }
+
+      _nextControlDebugTime = Time.time + 0.5f;
+      if(moveForwardInput && Mathf.Abs(steeringInput) < 0.01f){
+        bool hasWheelAngle = Mathf.Abs(frontLeftCollider.steerAngle) > 0.05f || Mathf.Abs(frontRightCollider.steerAngle) > 0.05f;
+        bool hasSideVelocity = Mathf.Abs(localVelocityX) > 0.1f;
+        if(hasWheelAngle || hasSideVelocity || Mathf.Abs(steeringAxis) > 0.01f){
+          Debug.Log($"[{nameof(PrometeoCarController)}] Forward with zero steering but car is not straight. " +
+            $"steeringInput={steeringInput:0.000}, steeringAxis={steeringAxis:0.000}, " +
+            $"frontLeftAngle={frontLeftCollider.steerAngle:0.000}, frontRightAngle={frontRightCollider.steerAngle:0.000}, " +
+            $"localVelocityX={localVelocityX:0.000}, localVelocityZ={localVelocityZ:0.000}, speed={carSpeed:0.000}", this);
+        }
+      }
     }
 
     // This method controls the car sounds. For example, the car engine will sound slow when the car speed is low because the
@@ -449,14 +342,17 @@ public class PrometeoCarController : MonoBehaviour
       if(useSounds){
         try{
           if(carEngineSound != null){
+            if(!carEngineSound.isPlaying){
+              carEngineSound.Play();
+            }
             float engineSoundPitch = initialCarEngineSoundPitch + (Mathf.Abs(carRigidbody.linearVelocity.magnitude) / 25f);
             carEngineSound.pitch = engineSoundPitch;
           }
-          if((isDrifting) || (isTractionLocked && Mathf.Abs(carSpeed) > 12f)){
+          if(tireScreechSound != null && ((isDrifting) || (isTractionLocked && Mathf.Abs(carSpeed) > 12f))){
             if(!tireScreechSound.isPlaying){
               tireScreechSound.Play();
             }
-          }else if((!isDrifting) && (!isTractionLocked || Mathf.Abs(carSpeed) < 12f)){
+          }else if(tireScreechSound != null && (!isDrifting) && (!isTractionLocked || Mathf.Abs(carSpeed) < 12f)){
             tireScreechSound.Stop();
           }
         }catch(Exception ex){

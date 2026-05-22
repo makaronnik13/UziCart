@@ -10,6 +10,9 @@ public class WindowsConfig : ScriptableObject
     public WindowId carSelectionWindowId;
     public WindowId trackSelectionWindowId;
     public WindowId inGameMenuWindowId;
+    public WindowId pauseWindowId;
+    public WindowId exitToMenuConfirmationPopupId;
+    public WindowId finishWindowId;
     public List<WindowId> popupWindowIds = new List<WindowId>();
 
     public bool IsPopup(WindowId windowId)

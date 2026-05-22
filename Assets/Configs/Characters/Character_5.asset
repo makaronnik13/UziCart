@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Character_5
   m_EditorClassIdentifier: Assembly-CSharp::CarConfigSO
   Prefab: {fileID: 8279353087714795557, guid: 23a47326661cae74c8d1550fd3542514, type: 3}
+  RacePrefab: {fileID: 8682370789283611066, guid: da511a1ba71287a4db7346a3a88146e5, type: 3}
   Preview: {fileID: 21300000, guid: 1e2e4c86b501a6f4b9db82eb49e4354b, type: 3}
   CarName: XO Racer
   Speed: 4

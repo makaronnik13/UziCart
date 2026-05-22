@@ -121,15 +121,21 @@ public class WindowsService : IWindowsService, IInitializable, IDisposable, IRun
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         AdvanceRequestGeneration();
+        HideAllManagedWindowsInstant();
         shownWindows.Clear();
+        mainStack.Clear();
+        popupStack.Clear();
         RebuildCache();
-        ResetStacksIfGameplayScene(scene.name);
+        OpenInitialMenuWindow();
     }
 
     void OnSceneUnloaded(Scene scene)
     {
         AdvanceRequestGeneration();
+        HideAllManagedWindowsInstant();
         shownWindows.Clear();
+        mainStack.Clear();
+        popupStack.Clear();
         RebuildCache();
     }
 
@@ -333,12 +339,50 @@ public class WindowsService : IWindowsService, IInitializable, IDisposable, IRun
             RebuildCache();
             if (!cache.TryGetValue(id, out window) || window == null)
             {
-                Debug.LogError($"Window not found in scene: {id.name}. Add a BaseWindow with this WindowId to the scene.", id);
-                return null;
+                window = CreateWindow(id);
+                if (window == null)
+                {
+                    Debug.LogError($"Window not found in scene: {id.name}. Add a BaseWindow with this WindowId to the scene or assign prefab in WindowId.", id);
+                    return null;
+                }
             }
         }
 
         return window;
+    }
+
+    BaseWindow CreateWindow(WindowId id)
+    {
+        if (id == null || id.Prefab == null)
+        {
+            return null;
+        }
+
+        GameObject instance = _container != null
+            ? _container.InstantiatePrefab(id.Prefab)
+            : UnityEngine.Object.Instantiate(id.Prefab);
+
+        BaseWindow window = instance.GetComponentInChildren<BaseWindow>(true);
+        if (window == null)
+        {
+            Debug.LogError($"Window prefab '{id.Prefab.name}' has no {nameof(BaseWindow)}.", id.Prefab);
+            UnityEngine.Object.Destroy(instance);
+            return null;
+        }
+
+        if (window.WindowId == null)
+        {
+            Debug.LogError($"Window prefab '{id.Prefab.name}' has no WindowId assigned.", window);
+            UnityEngine.Object.Destroy(instance);
+            return null;
+        }
+
+        if (!cache.ContainsKey(window.WindowId))
+        {
+            cache.Add(window.WindowId, window);
+        }
+
+        return window.WindowId == id ? window : null;
     }
 
     IObservable<Unit> OpenRoutine(int generation, WindowId id, bool keepPrevious, object payload, bool instant)
@@ -376,6 +420,10 @@ public class WindowsService : IWindowsService, IInitializable, IDisposable, IRun
                 })));
             }
         }
+        else if (current == null)
+        {
+            sequence = HideVisibleMainWindowsExcept(sequence, generation, next, instant);
+        }
 
         if (next.AddToWindowStack)
         {
@@ -390,6 +438,39 @@ public class WindowsService : IWindowsService, IInitializable, IDisposable, IRun
             OnWindowShown.Execute(next);
         })));
         return sequence;
+    }
+
+    IObservable<Unit> HideVisibleMainWindowsExcept(IObservable<Unit> sequence, int generation, BaseWindow next, bool instant)
+    {
+        foreach (BaseWindow window in cache.Values)
+        {
+            if (window == null ||
+                window == next ||
+                !window.IsVisible ||
+                window.PreventHide ||
+                IsPopupWindow(window))
+            {
+                continue;
+            }
+
+            BaseWindow windowToHide = window;
+            sequence = Then(sequence, () => IfCurrent(generation, () => windowToHide.HideRoutine(instant)));
+            sequence = Then(sequence, () => IfCurrent(generation, () => Run(() =>
+            {
+                MarkWindowHidden(windowToHide);
+                OnWindowHidden.Execute(windowToHide);
+            })));
+        }
+
+        return sequence;
+    }
+
+    bool IsPopupWindow(BaseWindow window)
+    {
+        return _settings != null &&
+               _settings.windowsConfig != null &&
+               window != null &&
+               _settings.windowsConfig.IsPopup(window.WindowId);
     }
 
     bool IsWindowVisibleInternal(WindowId id)

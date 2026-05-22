@@ -14,6 +14,7 @@ public class TrackSelectionWindow : BaseWindow
     [Inject(Optional = true)] GlobalSettings _settings;
     [Inject(Optional = true)] IWindowsService _windowsService;
     [Inject(Optional = true)] MetaGameService _metaGameService;
+    [Inject(Optional = true)] DiContainer _container;
 
     readonly List<TrackSelectionButton> _trackButtons = new List<TrackSelectionButton>();
     int _selectedIndex;
@@ -66,11 +67,21 @@ public class TrackSelectionWindow : BaseWindow
         for (int i = 0; i < count; i++)
         {
             int index = i;
-            TrackSelectionButton button = Instantiate(_trackButtonTemplate, _gridRoot);
+            TrackSelectionButton button = CreateTrackButton();
             button.gameObject.SetActive(true);
             button.Initialize(Tracks[i], index, Select);
             _trackButtons.Add(button);
         }
+    }
+
+    TrackSelectionButton CreateTrackButton()
+    {
+        if (_container != null)
+        {
+            return _container.InstantiatePrefabForComponent<TrackSelectionButton>(_trackButtonTemplate, _gridRoot);
+        }
+
+        return Instantiate(_trackButtonTemplate, _gridRoot);
     }
 
     void EnsureTemplate()

@@ -18,5 +18,9 @@ MonoBehaviour:
   carSelectionWindowId: {fileID: 11400000, guid: 4e1af7b968235f5438fec907610d578f, type: 2}
   trackSelectionWindowId: {fileID: 11400000, guid: fe43747ca8449da41be1facc28fc5984, type: 2}
   inGameMenuWindowId: {fileID: 0}
+  pauseWindowId: {fileID: 11400000, guid: 7ab3a35058c31df4ba13d1f4dcf88b31, type: 2}
+  exitToMenuConfirmationPopupId: {fileID: 11400000, guid: 483772aa6a9727846a68252f406d932f, type: 2}
+  finishWindowId: {fileID: 11400000, guid: 421b98da1f5ffc14f9042126f4e0f588, type: 2}
   popupWindowIds:
   - {fileID: 11400000, guid: be4ca4a6d33c4ed48b414bb0237820dd, type: 2}
+  - {fileID: 11400000, guid: 483772aa6a9727846a68252f406d932f, type: 2}

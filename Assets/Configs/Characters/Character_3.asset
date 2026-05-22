@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Character_3
   m_EditorClassIdentifier: Assembly-CSharp::CarConfigSO
   Prefab: {fileID: 2565771846628338603, guid: 29beed5d63a2acc4f8a02590006eac28, type: 3}
+  RacePrefab: {fileID: 7353823263517059618, guid: e023029db7dee8f4ca96b5d56ea57b1e, type: 3}
   Preview: {fileID: 21300000, guid: e44b35b9c4f68e446b86fe3bd94b0e48, type: 3}
   CarName: EA Alien
   Speed: 2

@@ -11,11 +11,14 @@ public class GlobalSettings : ScriptableObject
   
     public string menuSceneName = "Menu";
     public string gameplaySceneName = "Gameplay";
+    [Min(0f)] public float unfinishedRaceTimeMinOffset = 2f;
+    [Min(0f)] public float unfinishedRaceTimeMaxOffset = 15f;
    
     public List<CarConfigSO> cars = new List<CarConfigSO>();
     public List<TrackConfigSO> tracks = new List<TrackConfigSO>();
 
     public WindowId inGameMenuWindowId => windowsConfig != null ? windowsConfig.inGameMenuWindowId : null;
+    public string MenuSceneName => menuSceneName;
     public bool DebugTools => testTools;
   
 }

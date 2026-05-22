@@ -93,6 +93,7 @@ namespace Sound
 
         private void PerformPause(bool isPaused)
         {
+            /*
             if (isPaused)
             {
                 _pausedTrack = GetActiveAssetForSource(GetActiveMusicSource());
@@ -103,6 +104,7 @@ namespace Sound
                 PlayMusic(_offMusic, true);
                 if (_pausedTrack != null) PlayMusic(_pausedTrack, true);
             }
+            */
         }
 
         private MusicAsset GetActiveAssetForSource(AudioSource src)

@@ -11,6 +11,8 @@ public class ProjectContextInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
+        Application.targetFrameRate = 60;
+        QualitySettings.vSyncCount = 0;
         BindGlobalSettings();
         BindPauseService();
         BindSoundService();
